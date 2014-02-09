@@ -20,9 +20,12 @@
 #
 # 07/02/2014 - 1.0 - Fenix
 #   * initial version
+# 09/02/2014 - 1.1 - Fenix
+#   * register events using the event id
 #
+
 __author__ = 'Fenix'
-__version__ = '1.0'
+__version__ = '1.1'
 
 import b3
 import b3.plugin
@@ -98,7 +101,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
                     self._adminPlugin.registerCommand(self, cmd, level, func, alias)
 
         # register the events needed
-        self.registerEvent(b3.events.EVT_CLIENT_SAY, self.onSay)
+        self.registerEvent(self.console.getEventID('EVT_CLIENT_SAY'), self.onSay)
 
         # notice plugin startup
         self.debug('plugin started')
