@@ -148,6 +148,23 @@ class UrtfenixPlugin(b3.plugin.Plugin):
     ##                                                                                                                ##
     ####################################################################################################################
 
+    def cmd_pm(self, data, client, cmd=None):
+        """\
+        <client> <message> - send a private message to a client
+        """
+        m = self._adminPlugin.parseUserCmd(data)
+        if not m or not m[0] or not m[1]:
+            client.message('^7invalid data, try ^3!^7help pm')
+            return
+
+        cid, msg = m
+        sclient = self._adminPlugin.findClientPrompt(cid, client)
+        if not sclient:
+            return
+
+        # send the private message
+        sclient.message('^7%s: ^3%s' % (client.name, msg))
+
     def cmd_radio(self, data, client, cmd=None):
         """\
         Set the use of the radio <on/off>
