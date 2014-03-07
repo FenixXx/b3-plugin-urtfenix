@@ -148,7 +148,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
     ##                                                                                                                ##
     ####################################################################################################################
 
-    def cmd_pm(self, data, client, cmd=None):
+    def cmd_privatemessage(self, data, client, cmd=None):
         """\
         <client> <message> - send a private message to a client
         """
