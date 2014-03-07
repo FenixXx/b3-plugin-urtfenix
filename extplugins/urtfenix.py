@@ -22,10 +22,13 @@
 #   * initial version
 # 09/02/2014 - 1.1 - Fenix
 #   * register events using the event id
+# 08/03/2014 - 1.2 - Fenix
+#   * added command !privatemessage: send a message to a specific client
+#   * added command !adminmessage: send a message to all the online admins
 #
 
 __author__ = 'Fenix'
-__version__ = '1.1'
+__version__ = '1.2'
 
 import b3
 import b3.plugin
