@@ -165,6 +165,24 @@ class UrtfenixPlugin(b3.plugin.Plugin):
         # send the private message
         sclient.message('^7%s: ^3%s' % (client.name, msg))
 
+    def cmd_adminmessage(self, data, client, cmd=None):
+        """\
+        <message> - send a message to all the online admins
+        """
+        if not data:
+            client.message('^7missing data, try ^3!^7help adminmessage')
+            return
+
+        clist = self._adminPlugin.getAdmins()
+        if not len(clist):
+            client.message(self._adminPlugin.getMessage('no_admins'))
+            return
+
+        for c in clist:
+            if c != client:
+                # send the message and skip the author
+                c.message('^7%s: ^3%s' % (client.name, data))
+
     def cmd_radio(self, data, client, cmd=None):
         """\
         Set the use of the radio <on/off>
