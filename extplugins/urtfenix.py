@@ -41,7 +41,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
 
     _adminPlugin = None
 
-    _settings = dict(cmd_color_code=5)
+    _settings = dict(cmd_color_code=5, auto_ghost=False)
 
     ####################################################################################################################
     ##                                                                                                                ##
@@ -86,6 +86,16 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             self.error('could not load settings/cmd_color_code config value: %s' % e)
             self.debug('using default value (%s) for settings/cmd_color_code' % self._settings['cmd_color_code'])
 
+        try:
+            self._settings['auto_ghost'] = self.config.getboolean('settings', 'auto_ghost')
+            self.debug('loaded settings/auto_ghost setting: %s' % self._settings['auto_ghost'])
+        except NoOptionError:
+            self.warning('could not find settings/auto_ghost in config file, '
+                         'using default: %s' % self._settings['auto_ghost'])
+        except ValueError, e:
+            self.error('could not load settings/auto_ghost config value: %s' % e)
+            self.debug('using default value (%s) for settings/auto_ghost' % self._settings['auto_ghost'])
+
     def onStartup(self):
         """\
         Initialize plugin settings
@@ -105,6 +115,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
 
         # register the events needed
         self.registerEvent(self.console.getEventID('EVT_CLIENT_SAY'), self.onSay)
+        self.registerEvent(self.console.getEventID('EVT_CLIENT_CONNECT'), self.onConnect)
 
         # notice plugin startup
         self.debug('plugin started')
@@ -127,6 +138,14 @@ class UrtfenixPlugin(b3.plugin.Plugin):
     ##   EVENTS                                                                                                       ##
     ##                                                                                                                ##
     ####################################################################################################################
+
+    def onConnect(self, event):
+        """\
+        Handle EVT_CLIENT_CONNECT
+        """
+        client = event.client
+        if self._settings['auto_ghost'] and self.console.game.gameType == 'jump':
+            self.console.write('forcecvar %s cg_ghost %d' % (client.cid, 1))
 
     def onSay(self, event):
         """\
