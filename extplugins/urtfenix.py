@@ -25,10 +25,12 @@
 # 08/03/2014 - 1.2 - Fenix
 #   * added command !privatemessage: send a message to a specific client
 #   * added command !adminmessage: send a message to all the online admins
+# 31/03/2014 - 1.3 - Fenix
+#   * automatically enable ghosting on player connect if we are playing jump mode (and specified in the config file)
 #
 
 __author__ = 'Fenix'
-__version__ = '1.2'
+__version__ = '1.3'
 
 import b3
 import b3.plugin
