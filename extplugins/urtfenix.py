@@ -27,10 +27,12 @@
 #   * added command !adminmessage: send a message to all the online admins
 # 31/03/2014 - 1.3 - Fenix
 #   * automatically enable ghosting on player connect if we are playing jump mode (and specified in the config file)
-#
+# 06/10/2014 - 1.4 - Fenix
+#   * minor changes to comply with the last engine build
+#   * removed auto-ghost feature
 
 __author__ = 'Fenix'
-__version__ = '1.3'
+__version__ = '1.4'
 
 import b3
 import b3.plugin
@@ -60,12 +62,6 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             self.critical("unsupported game : %s" % self.console.gameName)
             raise SystemExit(220)
 
-        # check for correct server engine version
-        version = self.console.getCvar('version').getString()
-        if not version.startswith('ioQ3 1.35 urt-fenix'):
-            self.critical("unsupported server engine : %s" % version)
-            raise SystemExit(220)
-
         # get the admin plugin
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
@@ -73,7 +69,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             raise SystemExit(220)
 
     def onLoadConfig(self):
-        """\
+        """
         Load plugin configuration
         """
         try:
@@ -88,18 +84,8 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             self.error('could not load settings/cmd_color_code config value: %s' % e)
             self.debug('using default value (%s) for settings/cmd_color_code' % self._settings['cmd_color_code'])
 
-        try:
-            self._settings['auto_ghost'] = self.config.getboolean('settings', 'auto_ghost')
-            self.debug('loaded settings/auto_ghost setting: %s' % self._settings['auto_ghost'])
-        except NoOptionError:
-            self.warning('could not find settings/auto_ghost in config file, '
-                         'using default: %s' % self._settings['auto_ghost'])
-        except ValueError, e:
-            self.error('could not load settings/auto_ghost config value: %s' % e)
-            self.debug('using default value (%s) for settings/auto_ghost' % self._settings['auto_ghost'])
-
     def onStartup(self):
-        """\
+        """
         Initialize plugin settings
         """
         # register our commands
@@ -117,7 +103,6 @@ class UrtfenixPlugin(b3.plugin.Plugin):
 
         # register the events needed
         self.registerEvent(self.console.getEventID('EVT_CLIENT_SAY'), self.onSay)
-        self.registerEvent(self.console.getEventID('EVT_CLIENT_CONNECT'), self.onConnect)
 
         # notice plugin startup
         self.debug('plugin started')
@@ -141,16 +126,8 @@ class UrtfenixPlugin(b3.plugin.Plugin):
     ##                                                                                                                ##
     ####################################################################################################################
 
-    def onConnect(self, event):
-        """\
-        Handle EVT_CLIENT_CONNECT
-        """
-        client = event.client
-        if self._settings['auto_ghost'] and self.console.game.gameType == 'jump':
-            self.console.write('forcecvar %s cg_ghost %d' % (client.cid, 1))
-
     def onSay(self, event):
-        """\
+        """
         Handle EVT_CLIENT_SAY
         """
         if event.data[0] in (self._adminPlugin.cmdPrefix, self._adminPlugin.cmdPrefixLoud,
@@ -160,7 +137,6 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             # admin on this server, forward the command he just issued to all
             # the other connected clients who are in a equal/higher group
             if event.client.maxLevel >= self._adminPlugin._admins_level:
-
                 client = event.client
                 for admin in self._adminPlugin.getAdmins():
                     if admin != client and admin.maxLevel >= client.maxLevel:
@@ -173,7 +149,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
     ####################################################################################################################
 
     def cmd_privatemessage(self, data, client, cmd=None):
-        """\
+        """
         <client> <message> - send a private message to a client
         """
         m = self._adminPlugin.parseUserCmd(data)
@@ -190,7 +166,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
         sclient.message('^7%s: ^3%s' % (client.name, msg))
 
     def cmd_adminmessage(self, data, client, cmd=None):
-        """\
+        """
         <message> - send a message to all the online admins
         """
         if not data:
@@ -208,7 +184,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
                 c.message('^7%s: ^3%s' % (client.name, data))
 
     def cmd_radio(self, data, client, cmd=None):
-        """\
+        """
         Set the use of the radio <on/off>
         """
         if not data or data not in ('on', 'off'):
@@ -223,7 +199,7 @@ class UrtfenixPlugin(b3.plugin.Plugin):
             self.console.say('^7Radio: ^1OFF')
 
     def cmd_teleport(self, data, client, cmd=None):
-        """\
+        """
         <client> - teleport to a specific client
         """
         if not data:
